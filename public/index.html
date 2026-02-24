@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgojoGacor — Login</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;
+               background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f1a 100%); }
+        .auth-wrapper { width: 100%; max-width: 420px; }
+        .auth-logo { text-align: center; margin-bottom: 32px; }
+        .auth-logo .logo-main { font-size: 42px; }
+        .auth-logo h1 { font-size: 24px; color: var(--accent); margin: 8px 0 4px; }
+        .auth-logo p  { color: var(--text-muted); font-size: 14px; }
+        .auth-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+        .auth-tabs { display: flex; margin-bottom: 24px; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 4px; }
+        .auth-tab { flex: 1; padding: 8px; text-align: center; cursor: pointer; border-radius: 6px; font-size: 14px; font-weight: 600; color: var(--text-muted); transition: all 0.2s; }
+        .auth-tab.active { background: var(--accent); color: #fff; }
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+        .auth-footer { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+        .link-wa-note { background: rgba(76,201,240,0.1); border: 1px solid var(--accent-blue); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: var(--accent-blue); margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-logo">
+            <div class="logo-main">⚔️</div>
+            <h1>AlgojoGacor</h1>
+            <p>Platform Web — Migrasi dari WA Bot</p>
+        </div>
+
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="register">Daftar</div>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="login-form">
+                <div id="login-alert"></div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-input" id="login-username" placeholder="Masukkan username" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-input" id="login-password" placeholder="Masukkan password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-btn">
+                    🚀 Login
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="register-form">
+                <div class="link-wa-note">
+                    💡 Punya data WA Bot lama? Masukkan ID WA-mu agar aset terbawa otomatis!
+                </div>
+                <div id="register-alert"></div>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" class="form-input" id="reg-username" placeholder="Pilih username (3-20 karakter)" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-input" id="reg-password" placeholder="Min. 6 karakter, 1 kapital, 1 angka" required>
+                </div>
+                <div class="form-group">
+                    <label>ID WA Lama <span style="color:var(--text-muted)">(Opsional — untuk migrasi data)</span></label>
+                    <input type="text" class="form-input" id="reg-waid" placeholder="628xxxxxxxx@s.whatsapp.net">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg" id="register-btn">
+                    ✅ Buat Akun
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            AlgojoGacor Web v1.0 &bull; Powered by Node.js + MongoDB
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="/js/auth.js"></script>
+</body>
+</html>

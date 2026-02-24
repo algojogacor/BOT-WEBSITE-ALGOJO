@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgojoGacor — Ekonomi & Bank</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo"><span class="logo-icon">⚔️</span><div><div class="logo-text">AlgojoGacor</div></div></div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+                <a class="nav-item active" href="/pages/economy.html"><span class="nav-icon">💰</span> Ekonomi</a>
+                <a class="nav-item" href="/pages/games.html"><span class="nav-icon">🎮</span> Casino</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info"><div class="user-avatar" id="sidebar-avatar">?</div><div><div class="user-name" id="sidebar-username">Loading...</div><div class="user-role" id="sidebar-role">—</div></div></div>
+                <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+            </div>
+        </aside>
+        <div class="main-content">
+            <header class="topbar"><div style="display:flex;align-items:center;gap:12px"><button class="hamburger" onclick="toggleSidebar()">☰</button><span class="topbar-title">💰 Ekonomi & Bank</span></div></header>
+            <main class="content-area">
+                <!-- Balance -->
+                <div class="grid-2" style="margin-bottom:20px">
+                    <div class="stat-card"><div class="stat-value money" id="bal-wallet">...</div><div class="stat-label">💰 Dompet</div></div>
+                    <div class="stat-card"><div class="stat-value money" id="bal-bank">...</div><div class="stat-label">🏦 Bank</div></div>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Daily & Rob -->
+                    <div class="card">
+                        <div class="card-header"><span class="icon">🎁</span><h3>Klaim Harian</h3></div>
+                        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px">Klaim 500 koin setiap 24 jam. Jangan sampai lupa!</p>
+                        <button class="btn btn-success btn-block" onclick="ecoAction('daily')">🎁 Klaim Daily</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="icon">🏦</span><h3>Bank</h3></div>
+                        <div class="form-group">
+                            <label>Jumlah</label>
+                            <input type="number" class="form-input" id="bank-amount" placeholder="Contoh: 1000000 atau 'all'">
+                        </div>
+                        <div style="display:flex;gap:8px">
+                            <button class="btn btn-primary" onclick="ecoAction('deposit')">⬇️ Deposit</button>
+                            <button class="btn btn-secondary" onclick="ecoAction('withdraw')">⬆️ Tarik</button>
+                        </div>
+                    </div>
+
+                    <!-- Transfer -->
+                    <div class="card">
+                        <div class="card-header"><span class="icon">💳</span><h3>Transfer</h3></div>
+                        <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Limit harian: Rp 10 Miliar</p>
+                        <div class="form-group"><label>Username Tujuan</label><input type="text" class="form-input" id="transfer-target" placeholder="Username tujuan"></div>
+                        <div class="form-group"><label>Jumlah</label><input type="number" class="form-input" id="transfer-amount" placeholder="Jumlah yang ditransfer"></div>
+                        <button class="btn btn-primary btn-block" onclick="ecoAction('transfer')">💳 Transfer</button>
+                    </div>
+
+                    <!-- Jobs Quick -->
+                    <div class="card">
+                        <div class="card-header"><span class="icon">💼</span><h3>Pekerjaan</h3></div>
+                        <div id="job-status" style="font-size:13px;margin-bottom:12px;color:var(--text-secondary)">Loading...</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <button class="btn btn-success btn-sm" onclick="ecoAction('kerja')">💼 Kerja (Gaji)</button>
+                            <button class="btn btn-secondary btn-sm" onclick="location.href='/pages/jobs.html'">📋 Lihat Jobs</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="eco-result" style="margin-top:16px"></div>
+            </main>
+        </div>
+    </div>
+    <div id="toast-container"></div>
+    <script src="/js/api.js"></script>
+    <script>
+        if (!requireLogin()) throw new Error();
+        const ME = getUser();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('sidebar-username').textContent = ME.username;
+            document.getElementById('sidebar-role').textContent     = ME.role;
+            document.getElementById('sidebar-avatar').textContent   = ME.username[0].toUpperCase();
+            await loadBalance();
+        });
+
+        async function loadBalance() {
+            const [bal, profile] = await Promise.all([api.get('/economy/balance'), api.get('/user/profile')]);
+            if (bal?.success) {
+                document.getElementById('bal-wallet').textContent = fmtMoney(bal.balance);
+                document.getElementById('bal-bank').textContent   = fmtMoney(bal.bank);
+            }
+            if (profile?.success) {
+                const job = profile.profile.job;
+                document.getElementById('job-status').textContent = job ? `Pekerjaan: ${job}` : '😴 Pengangguran';
+            }
+        }
+
+        async function ecoAction(action) {
+            let res;
+            if (action === 'daily') {
+                res = await api.post('/economy/daily');
+            } else if (action === 'deposit') {
+                const amount = document.getElementById('bank-amount').value;
+                if (!amount) return toastError('Isi jumlah.');
+                res = await api.post('/economy/deposit', { amount: parseInt(amount) });
+            } else if (action === 'withdraw') {
+                const amount = document.getElementById('bank-amount').value;
+                if (!amount) return toastError('Isi jumlah.');
+                res = await api.post('/economy/withdraw', { amount: parseInt(amount) });
+            } else if (action === 'transfer') {
+                const target = document.getElementById('transfer-target').value.trim();
+                const amount = document.getElementById('transfer-amount').value;
+                if (!target || !amount) return toastError('Isi semua field.');
+                res = await api.post('/economy/transfer', { target, amount: parseInt(amount) });
+            } else if (action === 'kerja') {
+                res = await api.post('/economy/kerja');
+            }
+            if (!res) return;
+            if (res.success) { toastSuccess(res.message); await loadBalance(); }
+            else toastError(res.message);
+        }
+    </script>
+</body>
+</html>

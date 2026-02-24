@@ -1,0 +1,79 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #262421; /* Background Halaman Gelap */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container { 
+    text-align: center; 
+    width: 100%;
+    max-width: 500px;
+}
+
+h1 { margin-bottom: 10px; color: #f1c40f; }
+
+.controls { margin-bottom: 15px; }
+select { padding: 8px; border-radius: 5px; }
+
+.status-box {
+    margin-bottom: 10px;
+    font-weight: bold;
+    background: rgba(255,255,255,0.1);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* --- PAPAN CATUR --- */
+#chessboard {
+    display: grid;
+    /* Default HP: 42px per kotak */
+    grid-template-columns: repeat(8, 42px);
+    grid-template-rows: repeat(8, 42px);
+    margin: 0 auto;
+    width: fit-content;
+    border: 5px solid #4b4847; /* Bingkai Papan */
+    user-select: none;
+}
+
+.square {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px; /* Ukuran Bidak */
+    cursor: pointer;
+}
+
+/* WARNA PAPAN (Hijau & Krem) */
+.white { background-color: #eeeed2; color: black; }
+.black { background-color: #769656; color: white; }
+
+/* Highlight Kotak (Kuning Transparan) */
+.selected { background-color: rgba(255, 255, 0, 0.5) !important; }
+
+/* Titik Langkah (Hijau Gelap) */
+.possible-move::after {
+    content: '';
+    width: 30%; height: 30%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+}
+
+/* Responif buat Layar Besar */
+@media (min-width: 500px) {
+    #chessboard {
+        grid-template-columns: repeat(8, 60px);
+        grid-template-rows: repeat(8, 60px);
+    }
+    .square {
+        width: 60px;
+        height: 60px;
+        font-size: 45px;
+    }
+}

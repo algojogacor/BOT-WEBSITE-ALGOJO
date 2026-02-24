@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgojoGacor — Panel Admin</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .admin-section { margin-bottom: 28px; }
+        .admin-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+        .user-table-row .role-badge { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-icon">⚔️</span>
+                <div><div class="logo-text">AlgojoGacor</div></div>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+                <a class="nav-item active" href="/pages/admin.html"><span class="nav-icon">⚙️</span> Panel Admin</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="sidebar-avatar">?</div>
+                    <div><div class="user-name" id="sidebar-username">Loading...</div><div class="user-role" id="sidebar-role">—</div></div>
+                </div>
+                <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                    <span class="topbar-title">⚙️ Panel Admin</span>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <!-- Stats -->
+                <div class="admin-section">
+                    <h3 style="margin-bottom:12px">📊 Statistik Global</h3>
+                    <div id="stats-grid" class="grid-4">
+                        <div class="stat-card"><div class="stat-value" id="s-web-users">...</div><div class="stat-label">Web Users</div></div>
+                        <div class="stat-card"><div class="stat-value" id="s-wa-users">...</div><div class="stat-label">WA Users (Data Lama)</div></div>
+                        <div class="stat-card"><div class="stat-value" id="s-banned">...</div><div class="stat-label">Banned Users</div></div>
+                        <div class="stat-card"><div class="stat-value" id="s-money">...</div><div class="stat-label">Total Uang Beredar</div></div>
+                    </div>
+                </div>
+
+                <!-- Money Actions -->
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header"><span class="icon">💰</span><h3>Kelola Uang User</h3></div>
+                        <div class="grid-2">
+                            <div>
+                                <h4 style="margin-bottom:10px">➕ Add Uang</h4>
+                                <div class="form-group"><label>Username</label><input type="text" class="form-input" id="add-money-user" placeholder="Username target"></div>
+                                <div class="form-group"><label>Jumlah</label><input type="number" class="form-input" id="add-money-amount" placeholder="Contoh: 1000000"></div>
+                                <button class="btn btn-success btn-block" onclick="adminAction('add-money')">💰 Add Uang</button>
+                            </div>
+                            <div>
+                                <h4 style="margin-bottom:10px">⚙️ Set Uang</h4>
+                                <div class="form-group"><label>Username</label><input type="text" class="form-input" id="set-money-user" placeholder="Username target"></div>
+                                <div class="form-group"><label>Jumlah Baru</label><input type="number" class="form-input" id="set-money-amount" placeholder="Contoh: 0"></div>
+                                <button class="btn btn-primary btn-block" onclick="adminAction('set-money')">⚙️ Set Saldo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ban / Reset -->
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header"><span class="icon">🔨</span><h3>Ban & Reset User</h3></div>
+                        <div class="grid-2">
+                            <div>
+                                <h4 style="margin-bottom:10px">🔨 Ban User</h4>
+                                <div class="form-group"><label>Username</label><input type="text" class="form-input" id="ban-user" placeholder="Username target"></div>
+                                <div class="form-group"><label>Durasi (menit, 0 = permanen)</label><input type="number" class="form-input" id="ban-duration" value="60" min="0"></div>
+                                <div class="form-group"><label>Alasan</label><input type="text" class="form-input" id="ban-reason" placeholder="Alasan ban"></div>
+                                <div class="admin-actions">
+                                    <button class="btn btn-danger" onclick="adminAction('ban')">🔨 Ban</button>
+                                    <button class="btn btn-secondary" onclick="adminAction('unban')">✅ Unban</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style="margin-bottom:10px">🔄 Reset User</h4>
+                                <div class="form-group"><label>Username</label><input type="text" class="form-input" id="reset-user" placeholder="Username target"></div>
+                                <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px">Reset semua data ekonomi user (saldo, properti, dll) ke nilai awal.</p>
+                                <button class="btn btn-danger" onclick="adminAction('reset-user')">⚠️ Reset Data User</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event & Price -->
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header"><span class="icon">🎉</span><h3>Event & Harga</h3></div>
+                        <div class="grid-2">
+                            <div>
+                                <h4 style="margin-bottom:10px">🎉 Aktifkan Event</h4>
+                                <div class="form-group">
+                                    <label>Jenis Event</label>
+                                    <select class="form-input" id="event-type">
+                                        <option value="winrateGila">🎰 Winrate Gila (85% Menang Casino)</option>
+                                        <option value="doubleXp">⭐ Double XP</option>
+                                        <option value="doubleIncome">💰 Double Income</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label>Durasi (menit)</label><input type="number" class="form-input" id="event-duration" value="30" min="1"></div>
+                                <div class="admin-actions">
+                                    <button class="btn btn-success" onclick="adminAction('event-on')">▶️ Aktifkan</button>
+                                    <button class="btn btn-secondary" onclick="adminAction('event-off')">⏹️ Nonaktifkan</button>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style="margin-bottom:10px">💹 Set Harga Item</h4>
+                                <div class="form-group"><label>Nama Item</label><input type="text" class="form-input" id="price-item" placeholder="Contoh: padi, ayam, rtx4070"></div>
+                                <div class="form-group"><label>Harga Baru</label><input type="number" class="form-input" id="price-value" placeholder="Harga dalam Rupiah"></div>
+                                <button class="btn btn-primary" onclick="adminAction('set-price')">💹 Set Harga</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promote / Demote (Developer only) -->
+                <div class="admin-section developer-only hidden">
+                    <div class="card">
+                        <div class="card-header"><span class="icon">👑</span><h3>Promote / Demote (Developer)</h3></div>
+                        <div class="grid-2">
+                            <div>
+                                <div class="form-group"><label>Username</label><input type="text" class="form-input" id="promote-user" placeholder="Username target"></div>
+                                <div class="form-group">
+                                    <label>Role Baru</label>
+                                    <select class="form-input" id="promote-role">
+                                        <option value="admin">🛡️ Admin</option>
+                                        <option value="user">👤 User Biasa</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" onclick="adminAction('promote')">⬆️ Ubah Role</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User List -->
+                <div class="admin-section">
+                    <div class="card">
+                        <div class="card-header"><span class="icon">👥</span><h3>Daftar User</h3></div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Username</th><th>Role</th><th>Status</th><th>WA Linked</th><th>Aksi</th></tr></thead>
+                                <tbody id="user-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="/js/api.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

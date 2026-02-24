@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgojoGacor — Live Chat</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/chat.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-icon">⚔️</span>
+                <div><div class="logo-text">AlgojoGacor</div></div>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item" href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+                <a class="nav-item active" href="/chat.html"><span class="nav-icon">💬</span> Live Chat</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="sidebar-avatar">?</div>
+                    <div>
+                        <div class="user-name" id="sidebar-username">Loading...</div>
+                        <div class="user-role" id="sidebar-role">—</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <header class="topbar">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                    <span class="topbar-title">💬 Live Chat</span>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary btn-sm" onclick="showCreateRoomModal()">+ Buat Room</button>
+                    <button class="btn btn-secondary btn-sm" onclick="showDMModal()">📩 DM</button>
+                </div>
+            </header>
+
+            <div class="chat-layout">
+                <!-- Room/DM List -->
+                <div class="chat-sidebar" id="chat-sidebar">
+                    <div class="chat-sidebar-header">
+                        <strong>Rooms & DM</strong>
+                        <span id="room-count" style="font-size:12px;color:var(--text-muted)">0/10 rooms</span>
+                    </div>
+                    <div class="chat-list" id="room-list"></div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="chat-main">
+                    <div id="chat-header" class="chat-header" style="display:none">
+                        <div class="online-dot"></div>
+                        <strong id="chat-title">—</strong>
+                        <span id="chat-subtitle" style="font-size:12px;color:var(--text-muted);margin-left:auto"></span>
+                    </div>
+
+                    <div id="chat-empty" class="chat-empty">
+                        <div class="empty-icon">💬</div>
+                        <h3>Pilih room atau mulai DM</h3>
+                        <p style="color:var(--text-muted);font-size:14px">Tersedia 10 room chat & direct message privat</p>
+                    </div>
+
+                    <div id="chat-messages" class="chat-messages" style="display:none"></div>
+                    <div class="typing-indicator" id="typing-indicator"></div>
+
+                    <div id="chat-input-area" class="chat-input-area" style="display:none">
+                        <textarea class="chat-input" id="chat-input" placeholder="Ketik pesan..." rows="1"
+                            onkeydown="handleKeyDown(event)"
+                            oninput="handleTyping()"></textarea>
+                        <button class="btn btn-primary chat-send-btn" onclick="sendMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Room Modal -->
+    <div class="modal-backdrop hidden" id="create-room-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🏠 Buat Room Baru</h3>
+                <button class="modal-close" onclick="document.getElementById('create-room-modal').classList.add('hidden')">✕</button>
+            </div>
+            <div id="create-room-alert"></div>
+            <div class="form-group">
+                <label>Nama Room</label>
+                <input type="text" class="form-input" id="room-name" placeholder="Nama room (maks 30 karakter)" maxlength="30">
+            </div>
+            <div class="form-group">
+                <label>Password <span style="color:var(--text-muted)">(Opsional — kosongkan untuk publik)</span></label>
+                <input type="password" class="form-input" id="room-password" placeholder="Biarkan kosong jika publik">
+            </div>
+            <button class="btn btn-primary btn-block" onclick="createRoom()">✅ Buat Room</button>
+        </div>
+    </div>
+
+    <!-- DM Modal -->
+    <div class="modal-backdrop hidden" id="dm-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>📩 Direct Message</h3>
+                <button class="modal-close" onclick="document.getElementById('dm-modal').classList.add('hidden')">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Username tujuan</label>
+                <input type="text" class="form-input" id="dm-target" placeholder="Masukkan username">
+            </div>
+            <button class="btn btn-primary btn-block" onclick="startDM()">💬 Buka Chat</button>
+        </div>
+    </div>
+
+    <!-- Join Room Password Modal -->
+    <div class="modal-backdrop hidden" id="join-room-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔒 Room Berpassword</h3>
+                <button class="modal-close" onclick="document.getElementById('join-room-modal').classList.add('hidden')">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Password Room</label>
+                <input type="password" class="form-input" id="join-password" placeholder="Masukkan password room">
+            </div>
+            <input type="hidden" id="join-room-id">
+            <input type="hidden" id="join-room-name">
+            <button class="btn btn-primary btn-block" onclick="confirmJoinRoom()">🚪 Masuk Room</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="/js/api.js"></script>
+    <script src="/js/chat.js"></script>
+</body>
+</html>

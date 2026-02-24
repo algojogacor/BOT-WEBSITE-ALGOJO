@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgojoGacor — Dashboard</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-icon">⚔️</span>
+                <div>
+                    <div class="logo-text">AlgojoGacor</div>
+                    <div class="logo-sub">Web Platform</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">Utama</div>
+                <a class="nav-item active" href="/dashboard.html" data-page="home">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a class="nav-item" href="/pages/profile.html">
+                    <span class="nav-icon">👤</span> Profil & Status
+                </a>
+                <a class="nav-item" href="/chat.html">
+                    <span class="nav-icon">💬</span> Live Chat
+                </a>
+
+                <div class="nav-section">Kehidupan & Ekonomi</div>
+                <a class="nav-item" href="/pages/economy.html">
+                    <span class="nav-icon">💰</span> Ekonomi & Bank
+                </a>
+                <a class="nav-item" href="/pages/jobs.html">
+                    <span class="nav-icon">💼</span> Pekerjaan
+                </a>
+                <a class="nav-item" href="/pages/life.html">
+                    <span class="nav-icon">❤️</span> Survival
+                </a>
+
+                <div class="nav-section">Games</div>
+                <a class="nav-item" href="/pages/games.html">
+                    <span class="nav-icon">🎮</span> Casino & Games
+                </a>
+                <a class="nav-item" href="/pages/minigames.html">
+                    <span class="nav-icon">🎲</span> Mini Games
+                </a>
+
+                <div class="nav-section">Bisnis</div>
+                <a class="nav-item" href="/pages/farming.html">
+                    <span class="nav-icon">🌾</span> Farming
+                </a>
+                <a class="nav-item" href="/pages/ternak.html">
+                    <span class="nav-icon">🐄</span> Peternakan
+                </a>
+                <a class="nav-item" href="/pages/mining.html">
+                    <span class="nav-icon">⛏️</span> Mining
+                </a>
+                <a class="nav-item" href="/pages/property.html">
+                    <span class="nav-icon">🏢</span> Properti
+                </a>
+
+                <div class="nav-section">AI & Tools</div>
+                <a class="nav-item" href="/pages/ai.html">
+                    <span class="nav-icon">🤖</span> AI Chat
+                </a>
+                <a class="nav-item" href="/pages/tools.html">
+                    <span class="nav-icon">🛠️</span> Tools & Utilitas
+                </a>
+                <a class="nav-item" href="/pages/leaderboard.html">
+                    <span class="nav-icon">🏆</span> Leaderboard
+                </a>
+
+                <!-- Admin panel — tampil hanya jika admin/developer -->
+                <div class="nav-section admin-only hidden">Admin</div>
+                <a class="nav-item admin-only hidden" href="/pages/admin.html">
+                    <span class="nav-icon">⚙️</span> Panel Admin
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info" id="sidebar-user-info">
+                    <div class="user-avatar" id="sidebar-avatar">?</div>
+                    <div>
+                        <div class="user-name" id="sidebar-username">Loading...</div>
+                        <div class="user-role" id="sidebar-role">—</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-block btn-sm" onclick="logout()">🚪 Logout</button>
+            </div>
+        </aside>
+
+        <!-- ── Main ── -->
+        <div class="main-content">
+            <header class="topbar">
+                <div class="topbar-left" style="display:flex;align-items:center;gap:12px">
+                    <button class="hamburger" onclick="toggleSidebar()">☰</button>
+                    <span class="topbar-title">Dashboard</span>
+                </div>
+                <div class="topbar-actions">
+                    <span id="topbar-greeting" style="font-size:13px;color:var(--text-secondary)"></span>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <!-- Status Bars -->
+                <div class="status-grid" id="status-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-balance">...</div>
+                        <div class="stat-label">💰 Saldo Dompet</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-bank">...</div>
+                        <div class="stat-label">🏦 Saldo Bank</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-level">...</div>
+                        <div class="stat-label">🎖️ Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-job">...</div>
+                        <div class="stat-label">💼 Pekerjaan</div>
+                    </div>
+                </div>
+
+                <!-- Vital Bars -->
+                <div class="card" style="margin-bottom:20px">
+                    <div class="card-header">
+                        <span class="icon">🩺</span>
+                        <h3>Status Vital</h3>
+                        <span id="dead-badge" class="badge badge-banned hidden">💀 MATI</span>
+                        <span id="sleep-badge" class="badge" style="background:var(--accent-blue);color:#000" class="hidden">😴 TIDUR</span>
+                    </div>
+                    <div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+                            <span>❤️ HP</span><span id="hp-val">100%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar hp" id="hp-bar" style="width:100%"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0 4px">
+                            <span>🍗 Lapar</span><span id="hunger-val">100%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar hunger" id="hunger-bar" style="width:100%"></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin:8px 0 4px">
+                            <span>⚡ Energi</span><span id="energy-val">100%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar energy" id="energy-bar" style="width:100%"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+                        <button class="btn btn-primary btn-sm" onclick="quickAction('makan')">🍗 Makan (Rp50jt)</button>
+                        <button class="btn btn-secondary btn-sm" onclick="quickAction('daily')">🎁 Daily</button>
+                        <button class="btn btn-secondary btn-sm" onclick="quickAction('revive')">🏥 RS/Revive</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showSleepModal()">😴 Tidur</button>
+                    </div>
+                </div>
+
+                <!-- Feature Grid -->
+                <h3 style="margin-bottom:14px">🎮 Fitur Tersedia</h3>
+                <div class="feature-grid">
+                    <div class="feature-card" onclick="location.href='/pages/economy.html'">
+                        <span class="feature-icon">💰</span>
+                        <div class="feature-name">Ekonomi & Bank</div>
+                        <div class="feature-desc">Daily, transfer, deposit, rob</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/games.html'">
+                        <span class="feature-icon">🎰</span>
+                        <div class="feature-name">Casino & Games</div>
+                        <div class="feature-desc">Casino, slot, roulette, duel</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/farming.html'">
+                        <span class="feature-icon">🌾</span>
+                        <div class="feature-name">Farming</div>
+                        <div class="feature-desc">Tanam, panen, olah hasil</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/ternak.html'">
+                        <span class="feature-icon">🐄</span>
+                        <div class="feature-name">Peternakan</div>
+                        <div class="feature-desc">Beli, pakan, jual hewan</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/mining.html'">
+                        <span class="feature-icon">⛏️</span>
+                        <div class="feature-name">Mining</div>
+                        <div class="feature-desc">GPU rig, BTC mining</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/property.html'">
+                        <span class="feature-icon">🏢</span>
+                        <div class="feature-name">Properti</div>
+                        <div class="feature-desc">Usaha pasif income</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/jobs.html'">
+                        <span class="feature-icon">💼</span>
+                        <div class="feature-name">Pekerjaan</div>
+                        <div class="feature-desc">Lamar kerja, ambil gaji</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/chat.html'">
+                        <span class="feature-icon">💬</span>
+                        <div class="feature-name">Live Chat</div>
+                        <div class="feature-desc">10 room + DM privat</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/ai.html'">
+                        <span class="feature-icon">🤖</span>
+                        <div class="feature-name">AI Chat</div>
+                        <div class="feature-desc">Obrolan AI cerdas</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/tools.html'">
+                        <span class="feature-icon">🛠️</span>
+                        <div class="feature-name">Tools</div>
+                        <div class="feature-desc">Remove BG, TTS, cuaca</div>
+                    </div>
+                    <div class="feature-card" onclick="location.href='/pages/leaderboard.html'">
+                        <span class="feature-icon">🏆</span>
+                        <div class="feature-name">Leaderboard</div>
+                        <div class="feature-desc">Ranking terkaya</div>
+                    </div>
+                    <div class="feature-card admin-only hidden" onclick="location.href='/pages/admin.html'">
+                        <span class="feature-icon">⚙️</span>
+                        <div class="feature-name">Panel Admin</div>
+                        <div class="feature-desc">Kelola user & sistem</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Sleep Modal -->
+    <div class="modal-backdrop hidden" id="sleep-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>😴 Atur Waktu Tidur</h3>
+                <button class="modal-close" onclick="document.getElementById('sleep-modal').classList.add('hidden')">✕</button>
+            </div>
+            <div class="form-group">
+                <label>Durasi Tidur (1-10 jam)</label>
+                <input type="number" class="form-input" id="sleep-hours" min="1" max="10" value="8">
+            </div>
+            <div class="alert alert-info">Saat tidur, energi pulih +0.6%/menit & lapar hanya -0.02%/menit (hemat 5x).</div>
+            <button class="btn btn-primary btn-block" onclick="quickAction('tidur')">😴 Tidur Sekarang</button>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="/js/api.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
